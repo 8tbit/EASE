@@ -1,0 +1,6 @@
+{
+	"SizeDataPrecision" : 2,
+	"AlertFreeDiskSpaceLow" : true,
+	"WarningDiskPercentageRemaining" : 50,
+	"AlertOnDriveStatusFailure" : true
+}
