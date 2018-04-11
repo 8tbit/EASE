@@ -1,9 +1,44 @@
-<h1>EASE Configuration Webpage</h1>
-<form method="post">
-  <label>Webserver Port Number</label>
-  <input type="hidden" name="actiontype" value="updateconfig" />
-  <input type="text" name="lport" placeholder="8080"/>
-  <button type="submit">Update Port Number</button>
-</form>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/darkly/bootstrap.css">
+    <title>EASE Config</title>
+</head>
 
-<a href="http://localhost:8080/exit">Quit</a>
+<body>
+
+<div class="jumbotron">
+  <u><h1 style="text-align: center; " class="display-4">EASE Configuration Webpage</h1></u>
+</div>
+
+
+<div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+  <div class="card-header">Webserver Port Number</div>
+  <div class="card-body">
+    <h4 class="card-title">Update Port Number</h4>
+    <p class="card-text">
+      <form method="post">
+        <label>Webserver Port Number</label>
+        <input type="hidden" name="actiontype" value="updateconfig" />
+        <input type="text" name="lport" placeholder="@viewbag.port"/>
+        <button type="submit" class="btn btn-success">Update Port Number</button>
+      </form>
+    </p>
+  </div>
+</div>
+
+
+<div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
+  <a href="http://localhost:@viewbag.port/quit" style="text-decoration: none;color:#FFFFFF;">
+  <div class="card-header">SHUTDOWN</div>
+  <div class="card-body">
+    Turn off webserver!
+  </div>
+</a>
+</div>
+
+</body>
+
+</html>

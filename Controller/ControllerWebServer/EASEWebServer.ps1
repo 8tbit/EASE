@@ -608,8 +608,11 @@ try
 				if ($CHECKFILE -ne "")
 				{ # static content available
 					try {
+                        $WebFileContent = Get-Content $CHECKFILE
+                        $WebFileContent = ($WebFileContent -replace "@viewbag.port", ($BINDING.Split(':')[2].Replace('/', '')))
+
 						# ... serve static content
-						$BUFFER = [System.IO.File]::ReadAllBytes($CHECKFILE)
+						$BUFFER = [Text.Encoding]::UTF8.GetBytes($WebFileContent)#[System.IO.File]::ReadAllBytes($WebFileContent)
 						$RESPONSE.ContentLength64 = $BUFFER.Length
 						$RESPONSE.SendChunked = $FALSE
 						$EXTENSION = [IO.Path]::GetExtension($CHECKFILE)
