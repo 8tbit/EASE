@@ -1,18 +1,26 @@
 <html>
 <head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="https://bootswatch.com/4/darkly/bootstrap.css">
-    <title>EASE Config</title>
+    <title>EASE Home</title>
 </head>
+
+<style>
+
+</style>
 
 <body>
 
 <div class="jumbotron">
   <u><h1 style="text-align: center; " class="display-4">EASE Configuration Webpage</h1></u>
+  <hr>
+  <div align="center"><button type="button" class="btn btn-primary"><a href="http://localhost:@global.port/index.html">Home</a></button></div>
 </div>
-
 
 <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
   <div class="card-header">Webserver Port Number</div>
@@ -22,7 +30,7 @@
       <form method="post">
         <label>Webserver Port Number</label>
         <input type="hidden" name="actiontype" value="updateconfig" />
-        <input type="text" name="lport" placeholder="@viewbag.port"/>
+        <input type="text" name="lport" placeholder="@global.port"/>
         <button type="submit" class="btn btn-success">Update Port Number</button>
       </form>
     </p>
@@ -31,7 +39,7 @@
 
 
 <div class="card text-white bg-danger mb-3" style="max-width: 20rem;">
-  <a href="http://localhost:@viewbag.port/quit" style="text-decoration: none;color:#FFFFFF;">
+  <a href="http://localhost:@global.port/quit" style="text-decoration: none;color:#FFFFFF;">
   <div class="card-header">SHUTDOWN</div>
   <div class="card-body">
     Turn off webserver!

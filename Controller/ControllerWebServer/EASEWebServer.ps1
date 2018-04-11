@@ -608,8 +608,30 @@ try
 				if ($CHECKFILE -ne "")
 				{ # static content available
 					try {
+
+                        #Global Post Processing
                         $WebFileContent = Get-Content $CHECKFILE
-                        $WebFileContent = ($WebFileContent -replace "@viewbag.port", ($BINDING.Split(':')[2].Replace('/', '')))
+                        $WebFileContent = ($WebFileContent -replace "@global.port", ($BINDING.Split(':')[2].Replace('/', '')))
+                        $WebFileContent = ($WebFileContent -replace "@global.url.base", ($BINDING))
+                        $WebFileContent = ($WebFileContent -replace "@global.url", ($REQUEST.Url))
+                        $WebFileContent = ($WebFileContent -replace "@global.time.now", ([DateTime]::Now).ToString("h:m tt"))
+                        $WebFileContent = ($WebFileContent -replace "@global.date", ([DateTime]::Today).ToString("MM/dd/yyyy"))
+                        $WebFileContent = ($WebFileContent -replace "@global.computer.user", $env:UserName)
+                        $WebFileContent = ($WebFileContent -replace "@global.computer.name", $env:COMPUTERNAME)
+                        $WebFileContent = ($WebFileContent -replace "@global.computer.os", (Get-WmiObject -Class Win32_OperatingSystem).Caption)
+                        $WebFileContent = ($WebFileContent -replace "@global.computer.processors.count", $env:NUMBER_OF_PROCESSORS)
+
+                        if($WebFileContent -like "*@MetaLoad=*")
+                        {
+                            Write-Host "Loading custom powershell definitions for html interpreter..." -ForegroundColor Cyan
+                            $ImportPath = ($WebFileContent -split '=')[1]
+                            Write-Host $ImportPath -BackgroundColor Black
+                            $WebFileContent = $WebFileContent -replace "@MetaLoad=", ""
+                        }
+
+
+                        #SMART Web Interpreter
+
 
 						# ... serve static content
 						$BUFFER = [Text.Encoding]::UTF8.GetBytes($WebFileContent)#[System.IO.File]::ReadAllBytes($WebFileContent)
