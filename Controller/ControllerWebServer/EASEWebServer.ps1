@@ -614,7 +614,7 @@ try
                         $WebFileContent = ($WebFileContent -replace "@global.port", ($BINDING.Split(':')[2].Replace('/', '')))
                         $WebFileContent = ($WebFileContent -replace "@global.url.base", ($BINDING))
                         $WebFileContent = ($WebFileContent -replace "@global.url", ($REQUEST.Url))
-                        $WebFileContent = ($WebFileContent -replace "@global.time.now", ([DateTime]::Now).ToString("h:m tt"))
+                        $WebFileContent = ($WebFileContent -replace "@global.time.now", ([DateTime]::Now).ToString("h:mm tt"))
                         $WebFileContent = ($WebFileContent -replace "@global.date", ([DateTime]::Today).ToString("MM/dd/yyyy"))
                         $WebFileContent = ($WebFileContent -replace "@global.computer.user", $env:UserName)
                         $WebFileContent = ($WebFileContent -replace "@global.computer.name", $env:COMPUTERNAME)
