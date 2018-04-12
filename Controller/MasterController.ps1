@@ -124,21 +124,53 @@ foreach($modl in $LoadedModules)
     }
     catch [Exception]
     {
-        Write-Host ("There was an issue running module " + $global:modlr.ModuleName)
+        try
+        {
+            Invoke-Command $modl.ModuleRunFunction
+            Write-Host "Second Try Success!" -ForegroundColor Green
+        }
+        catch
+        {
+            Write-Host ("Second Chance Exception thrown: " + $global:modlr.ModuleName)
+            Write-Host ($_.Exception.GetType().FullName, $_.Exception.Message) -BackgroundColor Red -ForegroundColor Black
+            Write-Host "`n"
+        }
+
+        Write-Host ("Parent Exception thrown: " + $global:modlr.ModuleName)
         Write-Host ($_.Exception.GetType().FullName, $_.Exception.Message) -BackgroundColor Red -ForegroundColor Black
         Write-Host "`n"
     } #Do nothing if ModuleRunFunction is undefined
-    
-    try
+
+    if($modl.ModuleAlertFunction -eq $null)
     {
-		Write-Host ("Running Behavior Function of Module " + $global:modlr.ModuleName)
-        Invoke-Command $modl.ModuleAlertFunction -InputObject 0
+        Write-Host ("`nNo alert function defined for module: " + $global:modlr.ModuleName) -ForegroundColor Yellow -BackgroundColor DarkGray
+    } 
+    else
+    {
+        try
+        {
+		    Write-Host ("Running Behavior Function of Module " + $global:modlr.ModuleName)
+            Invoke-Command $modl.ModuleAlertFunction -InputObject 0
+        }
+        catch [Exception]
+        {
+            try
+            {
+                Invoke-Command $modl.ModuleAlertFunction
+                Write-Host "Second Try Success!" -ForegroundColor Green
+            }
+            catch
+            {
+                Write-Host ("Second Chance Exception thrown: " + $global:modlr.ModuleName)
+                Write-Host ($_.Exception.GetType().FullName, $_.Exception.Message) -BackgroundColor Red -ForegroundColor Black
+                Write-Host "`n"
+            }
+        
+            Write-Host ("Parent Exception thrown: " + $global:modlr.ModuleName)
+            Write-Host ($_.Exception.GetType().FullName, $_.Exception.Message) -BackgroundColor Red -ForegroundColor Black
+            Write-Host "`n"
+
+        } #Do nothing if ModuleAlertFunctin is undefined
     }
-    catch [Exception]
-    {
-        Write-Host ("There was an issue running behavior function of module " + $global:modlr.ModuleName)
-        Write-Host ($_.Exception.GetType().FullName, $_.Exception.Message) -BackgroundColor Red -ForegroundColor Black
-        Write-Host "`n"
-    } #Do nothing if ModuleAlertFunctin is undefined
 
 }

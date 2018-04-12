@@ -6,12 +6,12 @@ using module '..\DriveMonitoringModule.ps1'
 
 Function RunFunction
 {
-    $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\DriveMonitoringModule.ps1"
-    $ConfigPath = Join-Path -Path $PSScriptRoot -ChildPath ".\Interface Module Configs\VolumeDriveMonitorModuleInterfaceConfig.json"
+    $ScriptPath = Join-Path -Path $PSScriptRoot -ChildPath "..\DriveMonitoringModule.ps1" -Resolve
+    $ConfigPath = Join-Path -Path $PSScriptRoot -ChildPath ".\Interface Module Configs\VolumeDriveMonitorModuleInterfaceConfig.json" -Resolve
     $Results = & $ScriptPath -VolumeMonitoring -RunModuleForController
     $ConfigSettings = ImportJSON($ConfigPath)
 
-    [Alerts]$Alerts = [Alerts]::new()
+    [ModuleCore.Alerts]$Alerts = [ModuleCore.Alerts]::new()
     $Alerts.OwningModuleName = "VolumeDriveMonitorModuleInterface"
 
     foreach($disk in $Results.DrivesMeta)
@@ -21,7 +21,7 @@ Function RunFunction
 
         if($ldisk.SpaceRemaining -lt $ConfigSettings.MinimumFreeSpacePercent -and $ldisk.DriveType -eq "Local Disk")
         {
-            [Alert]$Alert = [Alert]::new()
+            [ModuleCore.Alert]$Alert = [ModuleCore.Alert]::new()
             $Alert.AlertId = $ldisk.DriveLetter
 
             $Alert.AlertDescription = ("Drive " + $ldisk.DriveLetter + " is low on space! | FreeSpaceRemaining: " + $ldisk.SpaceRemaining + "%")
@@ -52,15 +52,15 @@ Function RunFunction
 Function AlertsBehaviorFunction
 {
     #Get Registered Alerts of this Module
-    $errs = GetAlert("VolumeDriveMonitorModuleInterface")
+    $errs = GetAlerts("VolumeDriveMonitorModuleInterface")
     
-    if($errs.RegisteredAlerts.Count -eq 0)
+    if($errs.Count -eq 0)
     {
         return
     }
 
     Write-Host "`nReported Errors for VolumeDriveMonitoringModuleInterface`n---------------------------------------------------`n"
-    foreach($alert in $errs.RegisteredAlerts)
+    foreach($alert in $errs)
     {
         ## Repair Behavior
         [ModuleCore.Process]$Process = [ModuleCore.ProcessController]::GetProcess("VolumeDriveMonitoringModuleInterface", ("LowSpace:" + $alert.AlertId))
@@ -77,9 +77,9 @@ Function AlertsBehaviorFunction
             write-host (Get-Job | Out-String)
         }
     }
+
 }
 $Module.ModuleName = "VolumeDriveMonitorModuleInterface"
-$Module.Parameters = "-VolumeMonitoring -RunModuleForController"
 $Module.ModuleRunFunction = $Function:RunFunction
 $Module.ModuleAlertFunction = $Function:AlertsBehaviorFunction
 

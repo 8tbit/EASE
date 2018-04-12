@@ -4,10 +4,6 @@
     {
       "Name": "Volume Drive Monitor",
       "FileLocation": "..\\ScriptModules\\ModuleScriptInterface\\VolumeDriveMonitorModuleInterface.ps1"
-    },
-    {
-      "Name": "Physical Disk Monitor",
-      "FileLocation": "..\\ScriptModules\\ModuleScriptInterface\\PhysicalDiskMonitorModuleInterface.ps1"
     }
   ]
 }

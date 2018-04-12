@@ -6,30 +6,65 @@ PowerShellVersion = "5.0"
 FunctionToExport = "RegisterAlert, GetAlert, ImportJSON"
 }
 
-Function RegisterAlert([Alerts]$Alerts)
+Add-Type -TypeDefinition ((Get-Content -Path "..\ScriptModules\ProgrammingAPI\ModuleCoreFunctionality.cs") | Out-String)
+
+Function RegisterAlert([ModuleCore.Alerts]$Alerts)
 {
-    $ResultLocation = Join-Path -Path $PSScriptRoot -ChildPath "..\..\Controller\SystemMemory\Alerts.json"
-    $Alerts | ConvertTo-Json | Out-File -FilePath $ResultLocation -Append
-}
+    $ResultLocation = (Join-Path -Path $PSScriptRoot -ChildPath "..\..\Controller\SystemMemory\Alerts.json" -Resolve)
 
-Function GetAlert($AlertOwningModuleName)
-{
-    $ResultLocation = Join-Path -Path $PSScriptRoot -ChildPath "..\..\Controller\SystemMemory\Alerts.json"
-    $JSONResults = (Get-Content $ResultLocation) -join "`n" | ConvertFrom-Json
-    $OutResults = $JSONResults | where{$_.OwningModuleName -eq $AlertOwningModuleName}
+    [ModuleCore.AlertsContainer]$AContainer = [ModuleCore.AlertsContainer]::new()
+    
+    $PrevAlertsContainer = ImportJSON($ResultLocation)
 
-    $NewJSON
-
-    foreach($entry in $JSONResults)
+    if($PrevAlertsContainer -ne $null)
     {
-        if($entry.OwningModuleName -ne $AlertOwningModuleName)
+        foreach($entry in $PrevAlertsContainer.AlertContainer)
         {
-            $NewJSON += $entry
+            [ModuleCore.Alerts]$mAlerts = [ModuleCore.Alerts]::new()
+
+            $mAlerts.RegisteredAlerts = $entry.RegisteredAlerts
+            $mAlerts.OwningModuleName = $entry.OwningModuleName
+
+            $AContainer.AlertContainer.Add($mAlerts)
         }
     }
 
-    $NewJSON | ConvertTo-Json | Out-File -FilePath $ResultLocation -Force
+    $AContainer.AlertContainer.Add($Alerts)
+    $AContainer | ConvertTo-Json -Depth 100 | Out-File -FilePath $ResultLocation
+}
 
+Function GetAlerts($AlertOwningModuleName)
+{
+    $ResultLocation = Join-Path -Path $PSScriptRoot -ChildPath "..\..\Controller\SystemMemory\Alerts.json" -Resolve
+
+    $JSONResults = (Get-Content $ResultLocation) -join "`n" | ConvertFrom-Json
+    $OutResults = @()
+
+    [ModuleCore.AlertsContainer]$NewJSON = [ModuleCore.AlertsContainer]::new()
+
+    foreach($entry in $JSONResults.AlertContainer)
+    {
+        if($entry.OwningModuleName -eq $AlertOwningModuleName)
+        {
+            foreach($subentry in $entry.RegisteredAlerts)
+            {
+                $OutResults += $subentry
+            }
+        }
+
+        else
+        {
+            [ModuleCore.Alerts]$mAlerts = [ModuleCore.Alerts]::new()
+
+            $mAlerts.RegisteredAlerts = $entry.RegisteredAlerts
+            $mAlerts.OwningModuleName = $entry.OwningModuleName
+
+            $NewJSON.AlertContainer.Add($mAlerts)
+        }
+    }
+
+
+    $NewJSON | ConvertTo-Json -Depth 100 | Out-File -FilePath $ResultLocation -Force
     return $OutResults
 }
 
@@ -56,34 +91,14 @@ Class ModuleResults
     }
 }
 
-Class Alert
-{
-    [string]$AlertId
-    [string]$AlertDescription
-}
-
-Class Alerts
-{
-    [string]$OwningModuleName
-    $RegisteredAlerts = @()
-
-    Add([Alert]$AlertObj)
-    {
-        $this.RegisteredAlerts += $AlertObj
-    }
-}
-
 Class BasicModule
 {
     [string]$ModuleName
     [string]$ModuleFileLocation
     $ModuleRunFunction
-    $ModuleAlertFunction
-    [string]$Parameters
+    $ModuleAlertFunction = $null
     $ReportedAlerts
 
     [ModuleResults]$Results = [ModuleResults]::new()
 
 }
-
-Add-Type -TypeDefinition ((Get-Content -Path "..\ScriptModules\ProgrammingAPI\ModuleCoreFunctionality.cs") | Out-String)

@@ -2,9 +2,32 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Pipes;
 
 namespace ModuleCore
 {
+    public class Alert
+    {
+        public String AlertId;
+        public String AlertDescription;
+    }
+
+    public class Alerts
+    {
+        public String OwningModuleName;
+        public List<Alert> RegisteredAlerts = new List<Alert>();
+
+        public void Add(Alert AlertObj)
+        {
+            RegisteredAlerts.Add(AlertObj);
+        }
+    }
+
+    public class AlertsContainer
+    {
+        public List<Alerts> AlertContainer = new List<Alerts>();
+    }
+
     public enum ProcessStatus
     {
         Unaddressed,
@@ -129,16 +152,14 @@ namespace ModuleCore
 
         public static void AddProcess(String OwningModuleName, String ProcName, String Directions, ProcessStatus Status)
         {
-           /* if(DoesProcessExist(OwningModuleName, ProcName))
+            if(DoesProcessExist(OwningModuleName, ProcName))
             {
                 return;
             }
 
             Process newProcess = new Process { ProcessName = ProcName, Status = Status, OwningModule = OwningModuleName, RegisteredTime = DateTime.Now, ProcessDirections = Directions };
             Processes.RegisterProcess(newProcess);
-			*/
 			
-			Console.WriteLine(System.Environment.CurrentDirectory);
 			return;
         }
 
@@ -166,5 +187,9 @@ namespace ModuleCore
         }
 
     }
+
+}
+namespace ModuleStreamIO
+{
 
 }
