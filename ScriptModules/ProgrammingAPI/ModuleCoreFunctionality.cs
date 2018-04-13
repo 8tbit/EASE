@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
+using System.Diagnostics;
+using System.Threading;
 
 namespace ModuleCore
 {
@@ -99,14 +101,14 @@ namespace ModuleCore
             string Text = System.IO.File.ReadAllText(@".\SystemMemory\Processes.txt");
             string[] Processes = Text.Split('\n');
 
-            foreach(var proc in Processes)
+            foreach (var proc in Processes)
             {
                 string[] Attribs = proc.Split(',');
 
                 if (ModuleName == Attribs[0] && ProcName == Attribs[1])
                 {
 
-                    Process POut = new Process { OwningModule = Attribs[0], ProcessName = Attribs[1], ProcessDirections = Attribs[2], Status = (ProcessStatus) Enum.ToObject(typeof(ProcessStatus), ConvertStringToProcessStatus(Attribs[3])), RegisteredTime = Convert.ToDateTime(Attribs[4]) };
+                    Process POut = new Process { OwningModule = Attribs[0], ProcessName = Attribs[1], ProcessDirections = Attribs[2], Status = (ProcessStatus)Enum.ToObject(typeof(ProcessStatus), ConvertStringToProcessStatus(Attribs[3])), RegisteredTime = Convert.ToDateTime(Attribs[4]) };
                     return POut;
 
                 }
@@ -152,20 +154,20 @@ namespace ModuleCore
 
         public static void AddProcess(String OwningModuleName, String ProcName, String Directions, ProcessStatus Status)
         {
-            if(DoesProcessExist(OwningModuleName, ProcName))
+            if (DoesProcessExist(OwningModuleName, ProcName))
             {
                 return;
             }
 
             Process newProcess = new Process { ProcessName = ProcName, Status = Status, OwningModule = OwningModuleName, RegisteredTime = DateTime.Now, ProcessDirections = Directions };
             Processes.RegisterProcess(newProcess);
-			
-			return;
+
+            return;
         }
 
         public static void AddProcess(Process Proc)
         {
-            if(DoesProcessExist(Proc.OwningModule, Proc.ProcessName))
+            if (DoesProcessExist(Proc.OwningModule, Proc.ProcessName))
             {
                 return;
             }
@@ -191,5 +193,48 @@ namespace ModuleCore
 }
 namespace ModuleStreamIO
 {
+    public class PipeServer
+    {
+        public String ReadStreamData()
+        {
+            //Create a named pipe using the current process ID of this application
 
+            EventWaitHandle handle = new EventWaitHandle(false, EventResetMode.ManualReset, String.Format(@"Global\{0}", "SERVER_OPENED_HANDLE"));
+
+            using (NamedPipeServerStream pipeStream = new NamedPipeServerStream("EASEMasterController"))
+            {
+                //wait for a connection from another process
+                pipeStream.WaitForConnection();
+                if (!pipeStream.IsConnected)
+                {
+                    return "";
+                }
+
+                using (StreamReader sr = new StreamReader(pipeStream))
+                {
+                    string message = sr.ReadLine();
+                    return message;
+                }
+            }
+        }
+
+        public void SendStreamData(String Data)
+        {
+            using (NamedPipeClientStream pipeStream = new NamedPipeClientStream("EASEMasterController"))
+            {
+                //Wait for server to connect to client stream
+                while (!pipeStream.IsConnected)
+                {
+                    pipeStream.Connect();
+                }
+
+                //Send Data over pipe to EASE Master Controller Pipe
+                using (StreamWriter sw = new StreamWriter(pipeStream))
+                {
+                    sw.AutoFlush = true;
+                    sw.WriteLine(Data);
+                }
+            }
+        }
+    }
 }
