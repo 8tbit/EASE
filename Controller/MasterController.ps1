@@ -170,7 +170,7 @@ foreach($modl in $LoadedModules)
             Write-Host ($_.Exception.GetType().FullName, $_.Exception.Message) -BackgroundColor Red -ForegroundColor Black
             Write-Host "`n"
 
-        } #Do nothing if ModuleAlertFunctin is undefined
+        } #Do nothing if ModuleAlertFunction is undefined
     }
 
 }
