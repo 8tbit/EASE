@@ -2,8 +2,7 @@ Add-Type -TypeDefinition ((Get-Content -Path ".\ModuleCoreFunctionality.cs") | O
 
 [ModuleStreamIO.PipeServer]$PipeClient = [ModuleStreamIO.PipeServer]::new()
 
-for($i = 0; $i -lt 10; $i++)
+while($true)
 {
-$PipeClient.SendStreamData("Hello World! How are you doing today?")
-Start-Sleep -Milliseconds (Get-Random -Minimum 200 -Maximum 1000)
+    $PipeClient.SendStreamData((Read-Host "Enter message: "))
 }

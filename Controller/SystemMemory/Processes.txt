@@ -1,2 +1,0 @@
-VolumeDriveMonitoringModuleInterface,LowSpace:F:,DriveLetter:F:DiskSpaceRemaining:39.05,InProgress,4/11/2018 11:22:07 PM
-VolumeDriveMonitoringModuleInterface,LowSpace:G:,DriveLetter:G:DiskSpaceRemaining:39.06,InProgress,4/11/2018 11:22:07 PM

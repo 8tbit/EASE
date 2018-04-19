@@ -1,4 +1,4 @@
 {
-  "MinimumFreeSpacePercent": 40,
+  "MinimumFreeSpacePercent": 15,
   "UseVerbose" :  true
 }

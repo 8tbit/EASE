@@ -110,8 +110,8 @@ Write-Host "--------------------------------------------------------------------
 
 Write-Progress -Activity "Loading Modules" -Status "Converting Modules..." -Completed
 
-while($true)
-{
+#while($true)
+#{
 
 foreach($modl in $LoadedModules)
 {
@@ -175,4 +175,4 @@ foreach($modl in $LoadedModules)
 
 }
 
-}
+#}
